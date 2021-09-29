@@ -8,20 +8,20 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import RendererAgg
 
 st.set_page_config(layout="wide")
-matplotlib.use("agg")
-_lock = RendererAgg.lock
+# matplotlib.use("agg")
+# _lock = RendererAgg.lock
 
 row0_spacer1, row0_1, row0_spacer2 = st.columns(
     (.1, 3.2, .1))
 row0_1.title('An Emotional 2021 US Elections')
 
 row1_spacer1, row1_1, row1_spacer2 = st.columns((.1, 3.2, .1))
-row1_1.subheader('The US Elections happened on .... ')
+row1_1.subheader('The US Elections happened on 2 November 2021. There were calls on voter fraud and a rigged election. We investigate how the emotions changed on these topics before and after the elections by analyzing data on emotions and psychological values on Twitter a week before and a week after the elections.')
+DATE_COLUMN = 'created_at'
 
 @st.cache
 def load_data():
-    DATE_COLUMN = 'created_at'
-    random_sample_rows = 10000
+    random_sample_rows = 1000
 
     # TODO: FIGURE OUT HOW TO READ FROM AN ONLINE RESOURCE 
     #  
@@ -46,17 +46,36 @@ df_before_election, df_after_elections = load_data()
 
 line1_spacer1, line1_1, line1_spacer2 = st.columns((.1, 3.2, .1))
 st.header('First we look at the number of tweets over time before and after the US Elections')
+hour_to_filter = st.slider('hour', 0, 23, 17)
+before_time_filtered_data = df_before_election[df_before_election[DATE_COLUMN].dt.hour == hour_to_filter]
+after_time_filtered_data = df_after_elections[df_after_elections[DATE_COLUMN].dt.hour == hour_to_filter]
+
 row3_space1, row3_1, row3_space2, row3_2, row3_space3 = st.columns(
     (.1, 1, .1, 1, .1))
 
-with row3_1, _lock:
+with row3_1:
     st.subheader('Before Elections')
+    hist_values_before = np.histogram(before_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
+    st.bar_chart(hist_values_before)
 
-with row3_2, _lock:
+with row3_2:
     st.subheader('After Elections')
+    hist_values_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
+    st.bar_chart(hist_values_after)
 
 line2_spacer1, line2_1, line2_spacer2 = st.columns((.1, 3.2, .1))
 st.header('Then let\'s look at the emotions [we can do emotion flow graph, or change in emotions]')
+
+row4_space1, row4_1, row4_space2, row4_2, row4_space3 = st.columns(
+    (.1, 1, .1, 1, .1))
+
+st.header('We should add interactivity to choose emotion')
+
+# with row4_1:
+    # fig = df_before_election[["emotion.joy", "emotion.anger", "emotion.sadness", "emotion.disgust", "emotion.fear"]].size().plot(kind="bar")
+    # fig.xlabel('Emotion')
+    # fig.ylabel('Number of Tweets')
+    # st.pyplot(fig)
 
 line3_spacer1, line3_1, line3_spacer2 = st.columns((.1, 3.2, .1))
 st.header('Now we look at the feeling of time [liwc focuspast, focuspresent, focusfuture]')
