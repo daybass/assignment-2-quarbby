@@ -13,7 +13,7 @@ _lock = RendererAgg.lock
 
 row0_spacer1, row0_1, row0_spacer2 = st.columns(
     (.1, 3.2, .1))
-row0_1.title('Emotions before/after the US Elections')
+row0_1.title('An Emotional 2021 US Elections')
 
 row1_spacer1, row1_1, row1_spacer2 = st.columns((.1, 3.2, .1))
 row1_1.subheader('The US Elections happened on .... ')
@@ -34,8 +34,11 @@ def load_data():
     df_before_election = df_before_election.sample(n=random_sample_rows)
     df_after_elections = df_after_elections.sample(n=random_sample_rows)
 
-    df_before_election[DATE_COLUMN] = pd.to_datetime[DATE_COLUMN]
-    df_after_elections[DATE_COLUMN] = pd.to_datetime[DATE_COLUMN]
+    df_before_election[DATE_COLUMN] = pd.to_datetime(df_before_election[DATE_COLUMN])
+    df_after_elections[DATE_COLUMN] = pd.to_datetime(df_before_election[DATE_COLUMN])
+
+    df_before_election = df_before_election.fillna(0)
+    df_after_elections = df_after_elections.fillna(0)
 
     return df_before_election, df_after_elections
 
