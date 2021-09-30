@@ -98,21 +98,74 @@ emotion_columns_rename_dict = {"emotion.joy": "joy", "emotion.anger": "anger", "
                                                 "emotion.disgust": "disgust", "emotion.fear": "fear"}
 
 with row4_1:
-    fig, ax = plt.subplots()
     emotion_df = before_time_filtered_data[emotion_columns]
     emotion_df = emotion_df.rename(columns= emotion_columns_rename_dict)
     emotion_mean = emotion_df.mean()
     st.bar_chart(emotion_mean)
-    
+
+with row4_2:
+    emotion_df_after = after_time_filtered_data[emotion_columns]
+    emotion_df_after = emotion_df_after.rename(columns= emotion_columns_rename_dict)
+    emotion_after_mean = emotion_df_after.mean()
+    st.bar_chart(emotion_after_mean)
+
+st.header('Ok streamlit charts are limited. We should switch to plotly charts')
+
 st.header('Now we look at the feeling of time')
 st.subheader('They are represented by the values of *past, present, future* which are inferred through the Tweets.')
 
 row5_space1, row5_1, row5_space2, row5_2, row5_space3 = st.columns(
     (.1, 1, .1, 1, .1))
+time_columns = ['liwc.focuspast', 'liwc.focuspresent', 'liwc.focusfuture']
+time_columns_rename_dict = {'liwc.focuspast': 'past', 'liwc.focuspresent': 'present', 'liwc.focusfuture': 'future'}
+
+with row5_1:
+    time_df = before_time_filtered_data[time_columns]
+    time_df = time_df.rename(columns= time_columns_rename_dict)
+    time_mean = time_df.mean()
+    st.bar_chart(time_mean)
+
+with row5_2:
+    time_after_df = after_time_filtered_data[time_columns]
+    time_after_df = time_after_df.rename(columns= time_columns_rename_dict)
+    time_after_mean = time_after_df.mean()
+    st.bar_chart(time_after_mean)
 
 st.header('Now we look at the social processes [liwc family, friend, female male]')
+row6_space1, row6_1, row6_space2, row6_2, row6_space3 = st.columns(
+    (.1, 1, .1, 1, .1))
+social_columns = ['liwc.family', 'liwc.friend', 'liwc.female', 'liwc.male']
+social_columns_rename_dict = {'liwc.family': 'family', 'liwc.friend': 'friend', 'liwc.female': 'female', 'liwc.male': 'male'}
+
+with row6_1:
+    social_df = before_time_filtered_data[social_columns]
+    social_df = social_df.rename(columns= social_columns_rename_dict)
+    social_mean = social_df.mean()
+    st.bar_chart(social_mean)
+
+with row6_2:
+    social_after_df = after_time_filtered_data[social_columns]
+    social_after_df = social_after_df.rename(columns= social_columns_rename_dict)
+    social_after_mean = social_after_df.mean()
+    st.bar_chart(social_after_mean)
 
 st.header('Now we look at the drives [liwc affliation, achieve, power, reward, risk]')
+row7_space1, row7_1, row7_space2, row7_2, row7_space3 = st.columns(
+    (.1, 1, .1, 1, .1))
+drives_columns = ['liwc.affliation', 'liwc.achieve', 'liwc.power', 'liwc.reward', 'liwc.risk']
+drives_columns_rename_dict = {'liwc.affliation': 'affliation', 'liwc.achieve': 'achieve', 'liwc.power': 'power', 'liwc.reward': 'reward', 'liwc.risk': 'risk'}
+
+with row7_1:
+    drives_df = before_time_filtered_data[drives_columns]
+    drives_df = drives_df.rename(columns= drives_columns_rename_dict)
+    drives_mean = drives_df.mean()
+    st.bar_chart(drives_mean)
+
+with row7_2:
+    drives_df = after_time_filtered_data[drives_columns]
+    drives_df = drives_df.rename(columns= drives_columns_rename_dict)
+    drives_after_mean = drives_df.mean()
+    st.bar_chart(drives_after_mean)
 
 st.header('Now we look at the moral values')
 
