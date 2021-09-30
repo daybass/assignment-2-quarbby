@@ -22,7 +22,7 @@ In total, we collected 417,830 tweets before the election and more than 4.35 mil
 
 ### Data Processing 
 
-1. Remove RT tweets 
+After cleaning, we have around 30,000 tweets before the election. 
 
 ## Design Decisions 
 
