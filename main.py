@@ -13,7 +13,6 @@ with row0_1:
     st.markdown("![US Flag gif](https://media.giphy.com/media/3osxYcwi3hCVbzNYqY/giphy.gif)")
     row0_1.title('An Emotional 2021 US Elections')
 
-row1_spacer1, row1_1, row1_spacer2 = st.columns((.1, 3.2, .1))
 st.subheader('The US Elections happened on 2 November 2021. There were calls on voter fraud and a rigged election. We investigate how the emotions changed on these topics before and after the elections by analyzing data on emotions and psychological values on Twitter a week before and a week after the elections.')
 DATE_COLUMN = 'created_at'
 
@@ -27,22 +26,23 @@ def load_data():
 
     df_before_election[DATE_COLUMN] = df_before_election[DATE_COLUMN].apply(lambda x: x.replace('+00:00', ''))
     df_before_election[DATE_COLUMN] = pd.to_datetime(df_before_election[DATE_COLUMN])
-    df_after_election[DATE_COLUMN] = df_before_election[DATE_COLUMN].apply(lambda x: x.replace('+00:00', ''))
-    df_after_election[DATE_COLUMN] = pd.to_datetime(df_before_election[DATE_COLUMN])
+    df_after_election[DATE_COLUMN] = df_after_election[DATE_COLUMN].apply(lambda x: x.replace('+00:00', ''))
+    df_after_election[DATE_COLUMN] = pd.to_datetime(df_after_election[DATE_COLUMN])
 
     df_before_election = df_before_election.fillna(0)
-    df_after_elections = df_after_election.fillna(0)
+    df_after_election = df_after_election.fillna(0)
 
-    return df_before_election, df_after_elections
+    return df_before_election, df_after_election
 
-df_before_election, df_after_elections = load_data()
+df_before_election, df_after_election = load_data()
 
-line1_spacer1, line1_1, line1_spacer2 = st.columns((0.1, 3.2, 0.1))
 st.header('First we look at the number of tweets over time before and after the US Elections')
 
 min_date = min(df_before_election[DATE_COLUMN]).date()
-max_date = max(df_after_elections[DATE_COLUMN]).date()
+max_date = max(df_after_election[DATE_COLUMN]).date()
 date_format = 'YYYY-MM-DD HH:mm:ss'
+
+st.write(min_date, max_date)
 
 date_filter = st.slider('Select date range', min_value=min_date, max_value=max_date, value=(min_date, max_date), format=date_format)
 
@@ -53,14 +53,23 @@ with st.sidebar:
 before_mask = (df_before_election[DATE_COLUMN].dt.date >= date_filter[0]) & (df_before_election[DATE_COLUMN].dt.date <= date_filter[1])
 before_time_filtered_data = df_before_election.loc[before_mask]
 
+after_mask = (df_after_election[DATE_COLUMN].dt.date >= date_filter[0]) & (df_after_election[DATE_COLUMN].dt.date <= date_filter[1])
+after_time_filtered_data = df_after_election.loc[after_mask]
+
 before_time_filtered_data[DATE_COLUMN] = pd.to_datetime(before_time_filtered_data[DATE_COLUMN])
-# after_time_filtered_data[DATE_COLUMN] = pd.to_datetime(after_time_filtered_data[DATE_COLUMN])
+after_time_filtered_data[DATE_COLUMN] = pd.to_datetime(after_time_filtered_data[DATE_COLUMN])
+
+row1_space1, row1_1, row1_space2, row1_2, row1_space3 = st.columns(
+    (0.1, 1, 0.1, 1, 0.1))
+with row1_1:
+    st.subheader('Before Elections')
+with row1_2:
+    st.subheader('After Elections')
 
 row3_space1, row3_1, row3_space2, row3_2, row3_space3 = st.columns(
     (0.1, 1, 0.1, 1, 0.1))
 
 with row3_1:
-    st.subheader('Before Elections')
     st.text('By Hour of Day')
     hist_values_before = np.histogram(before_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
     st.bar_chart(hist_values_before)
@@ -70,13 +79,13 @@ with row3_1:
     st.bar_chart(hist_values_day_before)    
 
 with row3_2:
-    st.subheader('After Elections')
-    # hist_values_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
-    # st.bar_chart(hist_values_after)
-
     st.text('By Hour of Day')
+    hist_values_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
+    st.bar_chart(hist_values_after)
 
     st.text('By Day of Week')
+    hist_values_day_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.day, bins=7, range=(0,7))[0]
+    st.bar_chart(hist_values_day_after)  
 
 st.header('Then let\'s look at the emotions [we can do emotion flow graph, or change in emotions]')
 
