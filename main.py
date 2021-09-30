@@ -46,18 +46,24 @@ st.write(min_date, max_date)
 
 date_filter = st.slider('Select date range', min_value=min_date, max_value=max_date, value=(min_date, max_date), format=date_format)
 
-with st.sidebar:
-    st.markdown('🇺🇸 An Emotional US Elections')
-    st.write('date range: ', date_filter)
+user_input = st.text_input("Input keywords you want to filter the data with", "Joe Biden")
+
+keyword_mask = df_before_election['text'].str.contains(user_input)
 
 before_mask = (df_before_election[DATE_COLUMN].dt.date >= date_filter[0]) & (df_before_election[DATE_COLUMN].dt.date <= date_filter[1])
-before_time_filtered_data = df_before_election.loc[before_mask]
+before_time_filtered_data = df_before_election.loc[before_mask & keyword_mask]
 
 after_mask = (df_after_election[DATE_COLUMN].dt.date >= date_filter[0]) & (df_after_election[DATE_COLUMN].dt.date <= date_filter[1])
-after_time_filtered_data = df_after_election.loc[after_mask]
+after_time_filtered_data = df_after_election.loc[after_mask & keyword_mask]
 
 before_time_filtered_data[DATE_COLUMN] = pd.to_datetime(before_time_filtered_data[DATE_COLUMN])
 after_time_filtered_data[DATE_COLUMN] = pd.to_datetime(after_time_filtered_data[DATE_COLUMN])
+
+total = before_time_filtered_data.append(after_time_filtered_data)
+
+total = total[DATE_COLUMN].dt.date.value_counts()
+st.bar_chart(total)
+st.write(total)
 
 row1_space1, row1_1, row1_space2, row1_2, row1_space3 = st.columns(
     (0.1, 1, 0.1, 1, 0.1))
@@ -76,7 +82,7 @@ with row3_1:
 
     st.text('By Day of Week')
     hist_values_day_before = np.histogram(before_time_filtered_data[DATE_COLUMN].dt.day, bins=7, range=(0,7))[0]
-    st.bar_chart(hist_values_day_before)    
+    st.bar_chart(hist_values_day_before)
 
 with row3_2:
     st.text('By Hour of Day')
@@ -85,7 +91,7 @@ with row3_2:
 
     st.text('By Day of Week')
     hist_values_day_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.day, bins=7, range=(0,7))[0]
-    st.bar_chart(hist_values_day_after)  
+    st.bar_chart(hist_values_day_after)
 
 st.header('Then let\'s look at the emotions [we can do emotion flow graph, or change in emotions]')
 
@@ -94,7 +100,7 @@ row4_space1, row4_1, row4_space2, row4_2, row4_space3 = st.columns(
 
 st.write('We should add interactivity to choose emotion and put it to the sidebar')
 emotion_columns = ["emotion.joy", "emotion.anger", "emotion.sadness", "emotion.disgust", "emotion.fear"]
-emotion_columns_rename_dict = {"emotion.joy": "joy", "emotion.anger": "anger", "emotion.sadness": "sadness", 
+emotion_columns_rename_dict = {"emotion.joy": "joy", "emotion.anger": "anger", "emotion.sadness": "sadness",
                                                 "emotion.disgust": "disgust", "emotion.fear": "fear"}
 
 with row4_1:
@@ -174,3 +180,8 @@ st.header('Okay so we do some regressions')
 st.header('And have some conclusions')
 
 st.subheader('Finally, if you want the full details of the psycholinguistic stuff we used, please refer [here](https://github.com/IDSF21/assignment-2-quarbby).')
+
+with st.sidebar:
+    st.markdown('🇺🇸 An Emotional US Elections')
+    st.write('date range: ', date_filter)
+    st.bar_chart(emotion_mean)
