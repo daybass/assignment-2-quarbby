@@ -57,16 +57,12 @@ st.markdown('<p><span style=color:black;font-size:30px;font-weight:bold;> Sentim
             '<span style=color:red;font-size:30px;font-weight:bold;>' + user_input + '</span></p>', unsafe_allow_html=True)
 
 total_posneg_df = total_df.groupby([total_df[DATE_COLUMN].dt.date])["posneg"].mean()*100
-# fig = go.Figure()
-# for name, group in total_posneg_df:
-#     trace = go.Histogram()
-#     trace.name = name
-#     trace.x = group['posneg']
-#     fig.add_trace(trace)
-fig, ax = plt.subplots(figsize=(25,5))
-total_posneg_df.plot(kind='line')
-plt.show()
-st.pyplot(fig)
+total_posneg_df = total_posneg_df.reset_index()
+st.line_chart(total_posneg_df.rename(columns={DATE_COLUMN:'index', 'posneg': 'sentiment'}).set_index('index'))
+
+st.markdown('<p><span style=color:black;font-size:24px;font-weight:bold;>Average Sentiment about </span>' + 
+            '<span style=color:red;font-size:24px;font-weight:bold;>' + user_input + 
+            '</span><span style=color:black;font-size:24px;font-weight:bold;> is POSITIVE<span></p>', unsafe_allow_html=True)
 
 row1_1, row1_space2, row1_2, row1_space3 = st.columns(
     (1, 0.1, 1, 0.1))
@@ -129,6 +125,9 @@ with row4_2:
     plt.axis("off")
     st.pyplot(fig)
 
+st.markdown('<p><span style=color:black;font-size:24px;font-weight:bold;>The most popular words surrounding </span>' + 
+            '<span style=color:red;font-size:24px;font-weight:bold;>' + user_input + 
+            '</span><span style=color:black;font-size:24px;font-weight:bold;> is<span></p>', unsafe_allow_html=True)
 
 st.markdown('<p><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>What are the emotions of the tweets surrounding </span>' + 
             '<span style=color:red;font-size:30px;font-weight:bold;font-weight:bold;>' + user_input + '</span><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>?</b></p>', unsafe_allow_html=True)
