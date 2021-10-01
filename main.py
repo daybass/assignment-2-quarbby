@@ -1,14 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import seaborn as sns
 from plotly.graph_objs import Pie, Figure
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 from PIL import Image
 import matplotlib.pyplot as plt
+from plotly import graph_objs as go
 
 st.set_page_config(layout="wide")
-sns.set()
 
 row0_1, row0_spacer2 = st.columns(
     (3.2, 0.3))
@@ -41,26 +40,33 @@ df_before_election, df_after_election = load_data()
 st.markdown('<p style=color:black;font-size:30px;font-weight:bold;">Go ahead and filter the Tweets by keywords</p>', unsafe_allow_html=True)
 user_input = st.text_input("Keyword Filter", "Joe Biden")
 
-# with st.sidebar:
-#     st.markdown(user_input)
-
 before_keyword_mask = df_before_election['text'].str.contains(user_input)
 before_time_filtered_data = df_before_election.loc[before_keyword_mask]
 
 after_keyword_mask = df_after_election['text'].str.contains(user_input)
 after_time_filtered_data = df_after_election.loc[after_keyword_mask]
 
-total = before_time_filtered_data.append(after_time_filtered_data)
-
-st.markdown('')
-
-st.markdown('<p><span style=color:red;font-size:30px;font-weight:bold;>' + str(len(total)) + '<span>' + 
+total_df = before_time_filtered_data.append(after_time_filtered_data)
+st.markdown('<p><span style=color:red;font-size:30px;font-weight:bold;>' + str(len(total_df)) + '<span>' + 
             '<span style=color:black;font-size:30px;font-weight:bold;> Tweets are talking about </span>' + 
             '<span style=color:red;font-size:30px;font-weight:bold;>' + user_input + '</span></p>', unsafe_allow_html=True)
-total = total[DATE_COLUMN].dt.date.value_counts()
+total = total_df[DATE_COLUMN].dt.date.value_counts()
 st.bar_chart(total)
 
-st.header('ADD SENTIMENT LINE PLOT HERE')
+st.markdown('<p><span style=color:black;font-size:30px;font-weight:bold;> Sentiment of tweets about </span>' + 
+            '<span style=color:red;font-size:30px;font-weight:bold;>' + user_input + '</span></p>', unsafe_allow_html=True)
+
+total_posneg_df = total_df.groupby([total_df[DATE_COLUMN].dt.date])["posneg"].mean()*100
+# fig = go.Figure()
+# for name, group in total_posneg_df:
+#     trace = go.Histogram()
+#     trace.name = name
+#     trace.x = group['posneg']
+#     fig.add_trace(trace)
+fig, ax = plt.subplots(figsize=(25,5))
+total_posneg_df.plot(kind='line')
+plt.show()
+st.pyplot(fig)
 
 row1_1, row1_space2, row1_2, row1_space3 = st.columns(
     (1, 0.1, 1, 0.1))
