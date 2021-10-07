@@ -131,18 +131,11 @@ if(user_input):
 else:
     st.subheader("Time distribution of dataset")
 
-row1_1, row1_space2, row1_2, row1_space3 = st.columns(
-    (1, 0.1, 1, 0.1))
-with row1_1:
-    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
-with row1_2:
-    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
-
-
 row3_1, row3_space2, row3_2, row3_space3 = st.columns(
     (1, 0.1, 1, 0.1))
 
 with row3_1:
+    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
     st.text('By Hour of Day')
     hist_values_before = np.histogram(before_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
     st.bar_chart(hist_values_before)
@@ -152,6 +145,7 @@ with row3_1:
     st.bar_chart(hist_values_day_before)
 
 with row3_2:
+    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
     st.text('By Hour of Day')
     hist_values_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
     st.bar_chart(hist_values_after)
@@ -175,13 +169,6 @@ stopwords.update(["https", "t", "co", "let", "will", "s", "use", "take", "used",
 us_mask = np.array(Image.open("us_map.PNG"))
 us_color = np.array(Image.open("us.jpeg"))
 
-row1_1, row1_space2, row1_2, row1_space3 = st.columns(
-    (1, 0.1, 1, 0.1))
-with row1_1:
-    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
-with row1_2:
-    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
-
 row4_1, row4_space2, row4_2, row4_space3 = st.columns(
     (1, 0.1, 1, 0.1))
 
@@ -194,6 +181,7 @@ word_cleaning_after = re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)","
 word_cleaning_after = word_cleaning_after.replace(user_input, '')
 
 with row4_1:
+    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
     wordcloud_before = WordCloud(stopwords=stopwords, mask = us_mask, background_color="white", mode="RGB", max_words=100, width=800, height=400).generate(word_cleaning_before)
     fig, ax = plt.subplots(figsize=(5,5))
     image_colors = ImageColorGenerator(us_color)
@@ -205,6 +193,7 @@ with row4_1:
     st.write(list(wordcloud_before.words_.keys())[:20])
 
 with row4_2:
+    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
     wordcloud_after = WordCloud(stopwords=stopwords, mask = us_mask, max_font_size=100, background_color="white", mode="RGB", max_words=100).generate(word_cleaning_after)
     image_colors = ImageColorGenerator(us_color)
     plt.tight_layout(pad=0)
@@ -217,29 +206,41 @@ with row4_2:
 #Emotional Analysis
 
 if(user_input):
-    st.subheader("Topics/terms around tweets with '*"+user_input+"*'")
+    st.subheader("Emotions around tweets with '*"+user_input+"*'")
 else:
-    st.subheader("Top terms in the whole dataset")
-row1_1, row1_space2, row1_2, row1_space3 = st.columns(
-    (1, 0.1, 1, 0.1))
-with row1_1:
-    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
-with row1_2:
-    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
+    st.subheader("Tagged emotions for tweets in the whole dataset")
 
 
 row2_1, row2_space2, row2_2, row2_space3 = st.columns(
     (1, 0.1, 1, 0.1))
 with row2_1:
+    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
     percent = before_time_filtered_data['highest_emotion'].value_counts(normalize=True).mul(100).round(2)
     _data = Pie(labels=percent.index.tolist(),values=percent.values.tolist(),hoverinfo='label+percent')
     fig = Figure(data=[_data])
 
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=-0.02,
+        xanchor="right",
+        x=0
+    ))
+
     st.plotly_chart(fig,use_container_width=True)
 with row2_2:
+    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
     percent2 = after_time_filtered_data['highest_emotion'].value_counts(normalize=True).mul(100).round(2)
     _data2 = Pie(labels=percent2.index.tolist(),values=percent2.values.tolist(),hoverinfo='label+percent')
     fig2 = Figure(data=[_data2])
+
+    fig2.update_layout(legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=-0.02,
+        xanchor="right",
+        x=0
+    ))
 
     st.plotly_chart(fig2,use_container_width=True)
 
