@@ -106,6 +106,10 @@ values = ['negative', 'positive', 'neutral']
 total_df['sentiment'] = np.select(conditions, values)
 total_df['date'] = total_df[DATE_COLUMN].dt.date
 sentiment_table = total_df.groupby(['date','sentiment']).count()['id'].reset_index()
+
+st_new = sentiment_table.groupby(['sentiment']).sum()
+print(st_new)
+
 c = alt.Chart(sentiment_table).mark_bar(size=20).encode(
     x='date',
     y=alt.Y('id', axis=alt.Axis(values=[0,0.5,1]), stack='normalize', title='number of tweets'),
@@ -122,7 +126,10 @@ c = alt.Chart(sentiment_table).mark_bar(size=20).encode(
 sentiment_table['id'] = sentiment_table['id'].astype('int64', copy=False)
 st.write(c, use_container_width=True)
 
-st.markdown("Average sentiment on tweets around *'" + user_input + "'* is ")
+prevalent = st_new.sort_values('id', ascending=False).reset_index().iloc[0]['sentiment']
+
+
+st.markdown("Sentiment on tweets with *'" + user_input + "'* is mostly **"+ prevalent +"**")
 
 #Time Analysis
 
