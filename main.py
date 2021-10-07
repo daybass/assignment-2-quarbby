@@ -81,9 +81,9 @@ else:
     st.subheader("Statistic of tweets for the whole dataset")
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Total tweets", total_count)
-col2.metric("Tweets before election", before_count)
-col3.metric("Tweets after election", after_count, delta_count)
+col1.metric("Total tweets", f"{total_count:,}")
+col2.metric("Tweets before election", f"{before_count:,}")
+col3.metric("Tweets after election", f"{after_count:,}", f"{delta_count:.2f}"+"x")
 
 st.bar_chart(total)
 
@@ -122,20 +122,22 @@ c = alt.Chart(sentiment_table).mark_bar(size=20).encode(
 sentiment_table['id'] = sentiment_table['id'].astype('int64', copy=False)
 st.write(c, use_container_width=True)
 
-st.markdown('<p><span style=color:black;font-size:24px;font-weight:bold;>Average Sentiment about </span>' +
-            '<span style=color:red;font-size:24px;font-weight:bold;>' + user_input +
-            '</span><span style=color:black;font-size:24px;font-weight:bold;> is POSITIVE<span></p>', unsafe_allow_html=True)
+st.markdown("Average sentiment on tweets around *'" + user_input + "'* is ")
 
 #Time Analysis
+
+if(user_input):
+    st.subheader("What time do people usually tweet about '*"+user_input+"*'")
+else:
+    st.subheader("Time distribution of dataset")
+
 row1_1, row1_space2, row1_2, row1_space3 = st.columns(
     (1, 0.1, 1, 0.1))
 with row1_1:
-    st.markdown('<p style="background-color:lightblue;color:black;font-size:32px;font-weight:bold;">Before Elections</p>', unsafe_allow_html=True)
+    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
 with row1_2:
-    st.markdown('<p style="background-color:pink;color:black;font-size:32px;font-weight:bold;">After Elections</p>', unsafe_allow_html=True)
+    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
 
-st.markdown('<p><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>What time do people usually tweet about </span>' +
-            '<span style=color:red;font-size:30px;font-weight:bold;font-weight:bold;>' + user_input + '</span><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>?</b></p>', unsafe_allow_html=True)
 
 row3_1, row3_space2, row3_2, row3_space3 = st.columns(
     (1, 0.1, 1, 0.1))
@@ -158,16 +160,28 @@ with row3_2:
     hist_values_day_after = np.histogram(after_time_filtered_data[DATE_COLUMN].dt.day, bins=7, range=(0,7))[0]
     st.bar_chart(hist_values_day_after)
 
-st.markdown('<p><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>What are the topics of the tweets surrounding </span>' +
-            '<span style=color:red;font-size:30px;font-weight:bold;font-weight:bold;>' + user_input + '</span><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>?</b></p>', unsafe_allow_html=True)
+#Wordcloud
+
+if(user_input):
+    st.subheader("Topics/terms around tweets with '*"+user_input+"*'")
+else:
+    st.subheader("Top terms in the whole dataset")
+
 stopwords = set(STOPWORDS)
 stopwords.update(["https", "t", "co", "let", "will", "s", "use", "take", "used", "people", "said",
             "say", "wasnt", "go", "well", "thing", "amp", "put", "&", "even", "Yet", user_input])
+
 # st.subheader('TO PRE PROCESS THE TEXT IN PYTHON')
 us_mask = np.array(Image.open("us_map.PNG"))
 us_color = np.array(Image.open("us.jpeg"))
 
-st.write(user_input)
+row1_1, row1_space2, row1_2, row1_space3 = st.columns(
+    (1, 0.1, 1, 0.1))
+with row1_1:
+    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
+with row1_2:
+    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
+
 row4_1, row4_space2, row4_2, row4_space3 = st.columns(
     (1, 0.1, 1, 0.1))
 
@@ -180,7 +194,6 @@ word_cleaning_after = re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)","
 word_cleaning_after = word_cleaning_after.replace(user_input, '')
 
 with row4_1:
-    st.subheader('Before Elections')
     wordcloud_before = WordCloud(stopwords=stopwords, mask = us_mask, background_color="white", mode="RGB", max_words=100, width=800, height=400).generate(word_cleaning_before)
     fig, ax = plt.subplots(figsize=(5,5))
     image_colors = ImageColorGenerator(us_color)
@@ -192,7 +205,6 @@ with row4_1:
     st.write(list(wordcloud_before.words_.keys())[:20])
 
 with row4_2:
-    st.subheader('After Elections')
     wordcloud_after = WordCloud(stopwords=stopwords, mask = us_mask, max_font_size=100, background_color="white", mode="RGB", max_words=100).generate(word_cleaning_after)
     image_colors = ImageColorGenerator(us_color)
     plt.tight_layout(pad=0)
@@ -202,12 +214,19 @@ with row4_2:
 
     st.write(list(wordcloud_after.words_.keys())[:20])
 
-st.markdown('<p><span style=color:black;font-size:24px;font-weight:bold;>The most popular words surrounding </span>' +
-            '<span style=color:red;font-size:24px;font-weight:bold;>' + user_input +
-            '</span><span style=color:black;font-size:24px;font-weight:bold;> is<span></p>', unsafe_allow_html=True)
+#Emotional Analysis
 
-st.markdown('<p><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>What are the emotions of the tweets surrounding </span>' +
-            '<span style=color:red;font-size:30px;font-weight:bold;font-weight:bold;>' + user_input + '</span><span style=color:black;font-size:30px;font-weight:bold;font-weight:bold;>?</b></p>', unsafe_allow_html=True)
+if(user_input):
+    st.subheader("Topics/terms around tweets with '*"+user_input+"*'")
+else:
+    st.subheader("Top terms in the whole dataset")
+row1_1, row1_space2, row1_2, row1_space3 = st.columns(
+    (1, 0.1, 1, 0.1))
+with row1_1:
+    st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
+with row1_2:
+    st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
+
 
 row2_1, row2_space2, row2_2, row2_space3 = st.columns(
     (1, 0.1, 1, 0.1))
@@ -216,14 +235,30 @@ with row2_1:
     _data = Pie(labels=percent.index.tolist(),values=percent.values.tolist(),hoverinfo='label+percent')
     fig = Figure(data=[_data])
 
-    st.write(fig)
+    st.plotly_chart(fig,use_container_width=True)
 with row2_2:
     percent2 = after_time_filtered_data['highest_emotion'].value_counts(normalize=True).mul(100).round(2)
     _data2 = Pie(labels=percent2.index.tolist(),values=percent2.values.tolist(),hoverinfo='label+percent')
     fig2 = Figure(data=[_data2])
 
-    st.write(fig2)
+    st.plotly_chart(fig2,use_container_width=True)
 
-st.markdown('<p><span style=color:black;font-size:24px;font-weight:bold;>The most popular emotion surrounding </span>' +
-            '<span style=color:red;font-size:24px;font-weight:bold;>' + user_input +
-            '</span><span style=color:black;font-size:24px;font-weight:bold;> is<span></p>', unsafe_allow_html=True)
+st.markdown("Most common tagged emotion on tweets around *'" + user_input + "'* is ")
+
+a, space1, b, space2, c, space3, d, space4, e = st.columns(
+    (0.5, 0.1, 0.5, 0.1, 0.5, 0.1, 0.5, 0.1, 0.5))
+
+with a:
+    st.markdown("Sample tweet tagged with 'Disgust' around *'" + user_input + "'*")
+
+with b:
+    st.markdown("Sample tweet tagged with 'Sadness' around *'" + user_input + "'*")
+
+with c:
+    st.markdown("Sample tweet tagged with 'Joy' around *'" + user_input + "'*")
+
+with d:
+    st.markdown("Sample tweet tagged with 'Anger' around *'" + user_input + "'*")
+
+with e:
+    st.markdown("Sample tweet tagged with 'Fear' around *'" + user_input + "'*")
