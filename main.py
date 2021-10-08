@@ -303,25 +303,24 @@ if(total_count > 0):
 
         st.plotly_chart(fig2,use_container_width=True)
 
-    st.markdown("Most common tagged emotion on tweets around *'" + user_input + "'* is ")
+    st.markdown("""---""")
+    if(user_input):
+        st.markdown("### Explore random sampled tweets tagged with certain emotions around '*"+user_input+"*'")
+    else:
+        st.markdown("### Look at random sampled tweets tagged with certain emotions")
 
-    a, space1, b, space2, c, space3, d, space4, e = st.columns(
-        (0.5, 0.1, 0.5, 0.1, 0.5, 0.1, 0.5, 0.1, 0.5))
+    row5_1, space5, row5_2 = st.columns((1, 0.1, 1))
+    with row5_1:
+        options3 = st.selectbox('Select emotion',['disgust', 'anger', 'sadness', 'joy', 'fear'])
+    with row5_2:
+        options4 = st.selectbox('Select time scope',['Before election', 'After election'])
 
-    with a:
-        st.markdown("Sample tweet tagged with 'Disgust' around *'" + user_input + "'*")
-
-    with b:
-        st.markdown("Sample tweet tagged with 'Sadness' around *'" + user_input + "'*")
-
-    with c:
-        st.markdown("Sample tweet tagged with 'Joy' around *'" + user_input + "'*")
-
-    with d:
-        st.markdown("Sample tweet tagged with 'Anger' around *'" + user_input + "'*")
-
-    with e:
-        st.markdown("Sample tweet tagged with 'Fear' around *'" + user_input + "'*")
+    st.image("https://maxcdn.icons8.com/Color/PNG/48/Social_Networks/twitter-48.png")
+    if(options4 == 'Before election'):
+        tweet_sample3 = before_time_filtered_data[before_time_filtered_data['highest_emotion'] == options3]['text']
+    else:
+        tweet_sample3 = after_time_filtered_data[after_time_filtered_data['highest_emotion'] == options3]['text']
+    st.markdown(tweet_sample3.sample().values[0])
 
 else:
     st.markdown("Keyword not found in the dataset")
