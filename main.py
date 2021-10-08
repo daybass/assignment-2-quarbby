@@ -40,7 +40,7 @@ df_before_election, df_after_election = load_data()
 with st.container():
     st.subheader('Start by filtering the tweets by keywords')
     st.markdown("Use this filter to narrow your analysis to tweets containing certain keywords.  \n"
-    "*You can try 'Joe Biden', 'Trump', 'Michigan' or 'stopthesteal' to start*")
+    "*Try replacing the keyword to 'Trump', 'Michigan' or 'stopthesteal' to compare findings. Leave field blank to get a reading of the whole dataset*")
     user_input = st.text_input("Keyword Filter", "Joe Biden")
 
 with st.sidebar:
@@ -130,8 +130,11 @@ if(total_count > 0):
 
     prevalent = st_new.sort_values('id', ascending=False).reset_index().iloc[0]['sentiment']
 
+    if(user_input):
+        st.markdown("Sentiment on tweets with *'" + user_input + "'* is mostly **"+ prevalent +"**")
+    else:
+        st.markdown("Sentiment on all tweets in dataset is mostly **"+ prevalent +"**")
 
-    st.markdown("Sentiment on tweets with *'" + user_input + "'* is mostly **"+ prevalent +"**")
 
     #Time Analysis
 
@@ -225,8 +228,18 @@ if(total_count > 0):
         plt.imshow(wordcloud_before.recolor(color_func=image_colors), interpolation="bilinear")
         plt.axis("off")
         st.pyplot(fig)
+        topwords = list(wordcloud_before.words_.keys())[:10]
 
-        st.write(list(wordcloud_before.words_.keys())[:20])
+        topword_string = ''.join("**"+str(idx+1)+". "+val+"**  \n" for idx, val in enumerate(topwords))
+        st.markdown('### Top 10 co-occurring terms')
+        st.markdown(topword_string)
+        st.markdown("""---""")
+
+        st.markdown('See random selected tweet before the election containing the top words and the filter keyword to explore contexts and topics')
+        options = st.selectbox('Select top terms',list(wordcloud_before.words_.keys())[:10])
+        tweet_sample = before_time_filtered_data[before_time_filtered_data['text'].str.contains(options)].head()['text']
+        st.image("https://maxcdn.icons8.com/Color/PNG/48/Social_Networks/twitter-48.png")
+        st.markdown(tweet_sample.sample().values[0])
 
     with row4_2:
         st.markdown('<p style="background-color:pink;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">After Elections</p>', unsafe_allow_html=True)
@@ -236,8 +249,18 @@ if(total_count > 0):
         plt.imshow(wordcloud_after.recolor(color_func=image_colors), interpolation="bilinear")
         plt.axis("off")
         st.pyplot(fig)
+        topwords2 = list(wordcloud_after.words_.keys())[:10]
 
-        st.write(list(wordcloud_after.words_.keys())[:20])
+        topword_string2= ''.join("**"+str(idx2+1)+". "+val2+"**  \n" for idx2, val2 in enumerate(topwords2))
+        st.markdown('### Top 10 co-occurring terms')
+        st.markdown(topword_string2)
+        st.markdown("""---""")
+
+        st.markdown('See random selected tweet after the election containing the top terms and the filter keyword to explore contexts and topics')
+        options2 = st.selectbox('Select top terms',list(wordcloud_after.words_.keys())[:10])
+        tweet_sample2 = after_time_filtered_data[after_time_filtered_data['text'].str.contains(options2)].head()['text']
+        st.image("https://maxcdn.icons8.com/Color/PNG/48/Social_Networks/twitter-48.png")
+        st.markdown(tweet_sample2.sample().values[0])
 
     #Emotional Analysis
 
