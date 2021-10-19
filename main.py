@@ -205,7 +205,7 @@ if(total_count > 0):
                 "say", "wasnt", "go", "well", "thing", "amp", "put", "&", "even", "Yet", user_input])
 
     # st.subheader('TO PRE PROCESS THE TEXT IN PYTHON')
-    us_mask = np.array(Image.open("us_map.PNG"))
+    us_mask = np.array(Image.open("us_map.png"))
     us_color = np.array(Image.open("us.jpeg"))
 
     row4_1, row4_space2, row4_2, row4_space3 = st.columns(
@@ -218,6 +218,7 @@ if(total_count > 0):
     word_cleaning_after = ' '.join(text for text in after_time_filtered_data['text'])
     word_cleaning_after = re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",word_cleaning_after)
     word_cleaning_after = word_cleaning_after.replace(user_input, '')
+
 
     with row4_1:
         st.markdown('<p style="background-color:lightblue;color:white;font-size:1rem;padding: 5px; border-radius: 0.4rem">Before Elections</p>', unsafe_allow_html=True)
